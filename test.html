@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Chatbox</title>
+    <style>
+      #chatbox {
+        width: 300px;
+        height: 400px;
+        border: 1px solid #ccc;
+        overflow-y: scroll;
+        padding: 10px;
+      }
+      #message {
+        width: 80%;
+      }
+      #send {
+        width: 18%;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="chatbox"></div>
+    <input type="text" id="message" placeholder="Type a message..." />
+    <button id="send">Send</button>
+
+    <script>
+      const socket = new WebSocket('ws://localhost:8080');
+      const chatbox = document.getElementById('chatbox');
+      const messageInput = document.getElementById('message');
+      const sendButton = document.getElementById('send');
+
+      socket.addEventListener('message', function (event) {
+        const message = document.createElement('div');
+        message.textContent = 'Server: ' + event.data;
+        chatbox.appendChild(message);
+        chatbox.scrollTop = chatbox.scrollHeight;
+      });
+
+      sendButton.addEventListener('click', function () {
+        const message = messageInput.value;
+        if (message) {
+          socket.send(message);
+          chatbox.scrollTop = chatbox.scrollHeight;
+          messageInput.value = '';
+        }
+      });
+
+      messageInput.addEventListener('keypress', function (event) {
+        if (event.key === 'Enter') {
+          sendButton.click();
+        }
+      });
+    </script>
+  </body>
+</html>
